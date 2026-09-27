@@ -19,7 +19,7 @@ label{display:block;font-size:13px;color:#a9abb4;margin:0 0 7px}input,select{wid
 .entry{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;border-top:1px solid #292c34;padding:14px 0}.entry:first-child{border-top:0}.date{font-weight:700}.hours{font-size:18px;font-weight:700}.delete{border:0;background:#302025;color:#ff9fa8;border-radius:11px;padding:9px 11px}
 .split{display:flex;gap:7px;flex-wrap:wrap;margin-top:5px}.pill{background:#22252c;border-radius:9px;padding:4px 7px;font-size:12px;color:#c8cad1}.pill.day{color:#d8e8ff}.pill.night{color:#d8c7ff}
 .total{display:flex;justify-content:space-between;align-items:center;font-size:18px}.total strong{font-size:28px}
-.hidden{display:none!important}.login{max-width:440px;margin:12vh auto;padding:20px}table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:10px 6px;border-bottom:1px solid #2b2e35}th{color:#aeb0b8}
+.hidden{display:none!important}.login{max-width:440px;margin:12vh auto;padding:20px}table{width:100%;border-collapse:collapse;font-size:14px;table-layout:fixed}th,td{text-align:left;padding:10px 6px;border-bottom:1px solid #2b2e35;vertical-align:middle}th{color:#aeb0b8;white-space:nowrap}#report th:nth-child(1),#reportHead th:nth-child(1){width:27%}#report th:nth-child(2),#reportHead th:nth-child(2){width:28%}#report th:last-child,#reportHead th:last-child{width:22%}.collapse-btn{width:auto!important;padding:9px 13px;font-size:14px}.collapsed{display:none!important}
 @media(max-width:420px){h1{font-size:27px}.grid2{grid-template-columns:1fr}.entry{grid-template-columns:1fr}.entry .row{justify-content:flex-start}}
 </style>
 </head>
@@ -48,8 +48,8 @@ label{display:block;font-size:13px;color:#a9abb4;margin:0 0 7px}input,select{wid
 <div style="height:12px"></div><div class="grid2">
 <div><label>Okres kończący się</label><select id="filterMonth"></select></div><div><label>Rok</label><select id="filterYear"></select></div></div><div id="periodLabel" class="muted" style="margin-top:10px;font-size:13px"></div></div>
 
-<div class="card"><div class="row"><strong>Zapisane dni</strong><span class="muted" id="count"></span></div>
-<div id="entries" style="margin-top:4px"></div>
+<div class="card"><div class="row"><strong>Zapisane dni</strong><div class="row"><span class="muted" id="count"></span><button class="btn secondary small collapse-btn" id="toggleEntries">Pokaż</button></div></div>
+<div id="entries" class="collapsed" style="margin-top:4px"></div>
 <div class="total" style="border-top:1px solid #292c34;padding-top:16px;margin-top:4px"><span>SUMA</span><strong id="total">0:00 h</strong></div>
 <div class="muted" style="margin-top:8px;font-size:13px">Dzień: <span id="sumDay">0:00</span> · Noc: <span id="sumNight">0:00</span></div>
 </div>
@@ -75,7 +75,7 @@ function periodBounds(){let y=Number($("filterYear").value),m=Number($("filterMo
 
 async function loadEntries(){let{data,error}=await db.from("work_entries").select("*").order("work_date",{ascending:false});if(error){showMsg("appMsg","Nie udało się pobrać danych: "+error.message);return}entries=data||[];render()}
 function render(){
-let shown=visibleEntries();$("count").textContent=shown.length?shown.length+" dni":"";
+let shown=visibleEntries();$("count").textContent=shown.length?shown.length+" dni":"";$("toggleEntries").textContent="Pokaż";$("entries").classList.add("collapsed");
 $("entries").innerHTML=shown.length?shown.map(e=>{let day=nmin(e.day_hours),night=nmin(e.night_hours),total=nmin(e.hours);let split=(day?'<span class="pill day">☀️ Dzień '+fmt(day).replace(" h","")+'</span>':'')+(night?'<span class="pill night">🌙 Noc '+fmt(night).replace(" h","")+'</span>':'');return '<div class="entry"><div><div class="date">'+e.work_date+'</div><div class="muted">'+e.start_time.slice(0,5)+'–'+e.end_time.slice(0,5)+'</div><div class="split">'+split+'</div></div><div class="row"><span class="hours">'+fmt(total)+'</span><button class="delete" data-id="'+e.id+'">🗑️</button></div></div>'}).join(""):'<div class="muted" style="padding:16px 0">Brak zapisanych dni w tym miesiącu.</div>';
 let total=shown.reduce((s,e)=>s+nmin(e.hours),0),day=shown.reduce((s,e)=>s+nmin(e.day_hours),0),night=shown.reduce((s,e)=>s+nmin(e.night_hours),0);
 $("total").textContent=fmt(total);$("sumDay").textContent=fmt(day).replace(" h"," h");$("sumNight").textContent=night?fmt(night).replace(" h"," h"):"—";
@@ -95,7 +95,7 @@ for(let i=y-3;i<=y+2;i++){let o=document.createElement("option");o.value=i;o.tex
 for(let i=1;i<=12;i++){let o=document.createElement("option");o.value=i;o.textContent=String(i).padStart(2,"0");$("filterMonth").appendChild(o)}$("filterMonth").value=today.getMonth()+1;$("filterYear").value=y;updateCalc();updatePeriodLabel();
 ["sh","sm","eh","em","break"].forEach(id=>$(id).addEventListener("change",updateCalc));["filterMonth","filterYear"].forEach(id=>$(id).addEventListener("change",()=>{updatePeriodLabel();render()}));
 $("currentMonthBtn").onclick=()=>{let d=new Date();$("filterMonth").value=d.getMonth()+1;$("filterYear").value=d.getFullYear();updatePeriodLabel();render()};
-$("saveBtn").onclick=save;$("copyBtn").onclick=copyText;
+$("saveBtn").onclick=save;$("copyBtn").onclick=copyText;$("toggleEntries").onclick=()=>{let e=$("entries");let hidden=e.classList.toggle("collapsed");$("toggleEntries").textContent=hidden?"Pokaż":"Ukryj"};
 $("entries").addEventListener("click",e=>{let b=e.target.closest(".delete");if(b)deleteEntry(b.dataset.id)});
 let{data:{session}}=await db.auth.getSession();if(session){$("loginView").classList.add("hidden");$("appView").classList.remove("hidden");$("userEmail").textContent=session.user.email;await loadEntries()}
 }
