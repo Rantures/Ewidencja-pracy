@@ -57,7 +57,7 @@ label{display:block;font-size:13px;color:#a9abb4;margin:0 0 7px}input,select{wid
 </div>
 
 <div class="card"><div class="row"><strong>Dla księgowej</strong><button class="btn secondary small" id="csvBtn">Eksport CSV</button></div>
-<div style="overflow:auto;margin-top:10px"><table><thead><tr><th>Data</th><th>Godziny</th><th>Dzień</th><th>Noc</th><th>Łącznie</th></tr></thead><tbody id="report"></tbody></table></div></div>
+<div style="overflow:auto;margin-top:10px"><table><thead id="reportHead"></thead><tbody id="report"></tbody></table></div></div>
 </div>
 
 <script>
@@ -81,7 +81,7 @@ let shown=visibleEntries();$("count").textContent=shown.length?shown.length+" dn
 $("entries").innerHTML=shown.length?shown.map(e=>{let day=nmin(e.day_hours),night=nmin(e.night_hours),total=nmin(e.hours);let split=(day?'<span class="pill day">☀️ Dzień '+fmt(day).replace(" h","")+'</span>':'')+(night?'<span class="pill night">🌙 Noc '+fmt(night).replace(" h","")+'</span>':'');return '<div class="entry"><div><div class="date">'+e.work_date+'</div><div class="muted">'+e.start_time.slice(0,5)+'–'+e.end_time.slice(0,5)+'</div><div class="split">'+split+'</div></div><div class="row"><span class="hours">'+fmt(total)+'</span><button class="delete" data-id="'+e.id+'">🗑️</button></div></div>'}).join(""):'<div class="muted" style="padding:16px 0">Brak zapisanych dni w tym miesiącu.</div>';
 let total=shown.reduce((s,e)=>s+nmin(e.hours),0),day=shown.reduce((s,e)=>s+nmin(e.day_hours),0),night=shown.reduce((s,e)=>s+nmin(e.night_hours),0);
 $("total").textContent=fmt(total);$("sumDay").textContent=fmt(day).replace(" h"," h");$("sumNight").textContent=night?fmt(night).replace(" h"," h"):"—";
-$("report").innerHTML=shown.map(e=>'<tr><td>'+e.work_date+'</td><td>'+e.start_time.slice(0,5)+'–'+e.end_time.slice(0,5)+'</td><td>'+fmt(nmin(e.day_hours))+'</td><td>'+(nmin(e.night_hours)?fmt(nmin(e.night_hours)):"—")+'</td><td>'+fmt(nmin(e.hours))+'</td></tr>').join("")
+const hasNight=shown.some(e=>nmin(e.night_hours)>0);$("reportHead").innerHTML=hasNight?'<tr><th>Data</th><th>Godziny</th><th>Dzień</th><th>Noc</th><th>Łącznie</th></tr>':'<tr><th>Data</th><th>Godziny</th><th>Łącznie</th></tr>';$("report").innerHTML=shown.map(e=>hasNight?'<tr><td>'+e.work_date+'</td><td>'+e.start_time.slice(0,5)+'–'+e.end_time.slice(0,5)+'</td><td>'+fmt(nmin(e.day_hours))+'</td><td>'+(nmin(e.night_hours)?fmt(nmin(e.night_hours)):"—")+'</td><td>'+fmt(nmin(e.hours))+'</td></tr>':'<tr><td>'+e.work_date+'</td><td>'+e.start_time.slice(0,5)+'–'+e.end_time.slice(0,5)+'</td><td>'+fmt(nmin(e.hours))+'</td></tr>').join("")
 }
 async function save(){
 let date=$("date").value;if(!date){showMsg("appMsg","Wybierz datę.");return}let mins=workMinutes();if(mins<=0){showMsg("appMsg","Godzina zakończenia musi być późniejsza od rozpoczęcia.");return}
@@ -90,7 +90,7 @@ let payload={user_id:user.id,work_date:date,start_time:$("sh").value+":"+$("sm")
 let{error}=await db.from("work_entries").upsert(payload,{onConflict:"user_id,work_date"});if(error){showMsg("appMsg","Błąd zapisu: "+error.message);return}showMsg("appMsg","Dzień zapisany.",true);await loadEntries()
 }
 async function deleteEntry(id){if(!confirm("Usunąć ten dzień?"))return;let{error}=await db.from("work_entries").delete().eq("id",id);if(error){showMsg("appMsg","Nie udało się usunąć: "+error.message);return}await loadEntries()}
-function csv(){let shown=visibleEntries(),rows=[["Data","Godziny","Dzień","Noc","Łącznie"],...shown.map(e=>[e.work_date,e.start_time.slice(0,5)+"-"+e.end_time.slice(0,5),fmt(nmin(e.day_hours)).replace(" h",""),fmt(nmin(e.night_hours)).replace(" h",""),fmt(nmin(e.hours)).replace(" h","")])],csv=rows.map(r=>r.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(";")).join("\r\n"),blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="ewidencja_pracy.csv";a.click();URL.revokeObjectURL(a.href)}
+function csv(){let shown=visibleEntries(),hasNight=shown.some(e=>nmin(e.night_hours)>0),rows=hasNight?[["Data","Godziny","Dzień","Noc","Łącznie"],...shown.map(e=>[e.work_date,e.start_time.slice(0,5)+"-"+e.end_time.slice(0,5),fmt(nmin(e.day_hours)).replace(" h",""),fmt(nmin(e.night_hours)).replace(" h",""),fmt(nmin(e.hours)).replace(" h","")])]:[["Data","Godziny","Łącznie"],...shown.map(e=>[e.work_date,e.start_time.slice(0,5)+"-"+e.end_time.slice(0,5),fmt(nmin(e.hours)).replace(" h","")])],csv=rows.map(r=>r.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(";")).join("\r\n"),blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="ewidencja_pracy.csv";a.click();URL.revokeObjectURL(a.href)}
 async function init(){
 fillTimes();let today=new Date();$("date").value=today.toISOString().slice(0,10);let y=today.getFullYear();
 for(let i=y-3;i<=y+2;i++){let o=document.createElement("option");o.value=i;o.textContent=i;$("filterYear").appendChild(o)}
