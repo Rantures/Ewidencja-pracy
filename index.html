@@ -36,7 +36,7 @@ label{display:block;font-size:13px;color:#a9abb4;margin:0 0 7px}input,select{wid
 
 <div class="card">
 <div class="grid2"><div><label>Data</label><input id="date" type="date"></div>
-<div><label>Przerwa</label><label class="check" style="margin-top:9px"><input id="break" type="checkbox"> 30 minut</label></div></div>
+<div><label>Przerwa</label><label class="check" style="margin-top:9px"><input id="break" type="checkbox" checked> 30 minut</label></div></div>
 <div style="height:14px"></div>
 <div class="grid2"><div><label>Od</label><div class="time"><select id="sh"></select><select id="sm"></select></div></div>
 <div><label>Do</label><div class="time"><select id="eh"></select><select id="em"></select></div></div></div>
@@ -57,7 +57,7 @@ label{display:block;font-size:13px;color:#a9abb4;margin:0 0 7px}input,select{wid
 <div class="card"><div class="row"><strong>Dla księgowej</strong><button class="btn secondary small" id="copyBtn">Kopiuj tekst</button></div>
 <div style="overflow:auto;margin-top:10px"><table><thead id="reportHead"></thead><tbody id="report"></tbody></table></div></div>
 </div>
-  <div class="version">v1.13</div>
+  <div class="version">v1.14</div>
 </div>
 
 <script>
@@ -94,9 +94,9 @@ function copyText(){let shown=visibleEntries();if(!shown.length){showMsg("appMsg
 async function init(){
 fillTimes();let today=new Date();$("date").value=today.toISOString().slice(0,10);let y=today.getFullYear();
 for(let i=y-3;i<=y+2;i++){let o=document.createElement("option");o.value=i;o.textContent=i;$("filterYear").appendChild(o)}
-let monthNames=["Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec","Lipiec","Sierpień","Wrzesień","Październik","Listopad","Grudzień"];for(let i=1;i<=12;i++){let o=document.createElement("option");o.value=i;o.textContent=monthNames[i-1];$("filterMonth").appendChild(o)}$("filterMonth").value=today.getMonth()+1;$("filterYear").value=y;updateCalc();updatePeriodLabel();
+let monthNames=["Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec","Lipiec","Sierpień","Wrzesień","Październik","Listopad","Grudzień"];for(let i=1;i<=12;i++){let o=document.createElement("option");o.value=i;o.textContent=monthNames[i-1];$("filterMonth").appendChild(o)}let periodMonth=today.getDate()>=21?today.getMonth()+2:today.getMonth()+1,periodYear=y;if(periodMonth===13){periodMonth=1;periodYear=y+1}$("filterMonth").value=periodMonth;$("filterYear").value=periodYear;updateCalc();updatePeriodLabel();
 ["sh","sm","eh","em","break"].forEach(id=>$(id).addEventListener("change",updateCalc));["filterMonth","filterYear"].forEach(id=>$(id).addEventListener("change",()=>{updatePeriodLabel();render()}));
-$("currentMonthBtn").onclick=()=>{let d=new Date();$("filterMonth").value=d.getMonth()+1;$("filterYear").value=d.getFullYear();updatePeriodLabel();render()};
+$("currentMonthBtn").onclick=()=>{let d=new Date(),pm=d.getDate()>=21?d.getMonth()+2:d.getMonth()+1,py=d.getFullYear();if(pm===13){pm=1;py++}$("filterMonth").value=pm;$("filterYear").value=py;updatePeriodLabel();render()};
 $("saveBtn").onclick=save;$("copyBtn").onclick=copyText;$("toggleEntries").onclick=()=>{let e=$("entries");let hidden=e.classList.toggle("collapsed");$("toggleEntries").textContent=hidden?"Pokaż":"Ukryj"};
 $("entries").addEventListener("click",e=>{let b=e.target.closest(".delete");if(b)deleteEntry(b.dataset.id)});
 let{data:{session}}=await db.auth.getSession();if(session){$("loginView").classList.add("hidden");$("appView").classList.remove("hidden");$("userEmail").textContent=session.user.email;await loadEntries()}
