@@ -66,7 +66,7 @@ const SUPABASE_KEY="sb_publishable_k6BT46z0PkYpDq7a1Nx7yw_1r1tV641";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const $=id=>document.getElementById(id);let entries=[];
 
-function fillTimes(){for(let h=0;h<24;h++)for(const id of["sh","eh"]){let o=document.createElement("option");o.value=String(h).padStart(2,"0");o.textContent=o.value;$(id).appendChild(o)}for(const m of[0,30])for(const id of["sm","em"]){let o=document.createElement("option");o.value=String(m).padStart(2,"0");o.textContent=o.value;$(id).appendChild(o)}$("sh").value="07";$("eh").value="15"}
+function fillTimes(){for(let h=0;h<24;h++)for(const id of["sh","eh"]){let o=document.createElement("option");o.value=String(h).padStart(2,"0");o.textContent=o.value;$(id).appendChild(o)}for(const m of[0,30])for(const id of["sm","em"]){let o=document.createElement("option");o.value=String(m).padStart(2,"0");o.textContent=o.value;$(id).appendChild(o)}$("sh").value="06";$("eh").value="18"}
 function minutes(h,m){return Number(h)*60+Number(m)}
 function workMinutes(){let a=minutes($("sh").value,$("sm").value),b=minutes($("eh").value,$("em").value);if(b<=a)b+=1440;let x=b-a;if($("break").checked)x-=30;return Math.max(0,x)}
 function fmt(min){let h=Math.floor(min/60),m=min%60;return h+":"+String(m).padStart(2,"0")+" h"}
