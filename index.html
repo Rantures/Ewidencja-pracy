@@ -19,7 +19,7 @@ label{display:block;font-size:13px;color:#a9abb4;margin:0 0 7px}input,select{wid
 .entry{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;border-top:1px solid #292c34;padding:14px 0}.entry:first-child{border-top:0}.date{font-weight:700}.hours{font-size:18px;font-weight:700}.delete{border:0;background:#302025;color:#ff9fa8;border-radius:11px;padding:9px 11px}
 .split{display:flex;gap:7px;flex-wrap:wrap;margin-top:5px}.pill{background:#22252c;border-radius:9px;padding:4px 7px;font-size:12px;color:#c8cad1}.pill.day{color:#d8e8ff}.pill.night{color:#d8c7ff}
 .total{display:flex;justify-content:space-between;align-items:center;font-size:18px}.total strong{font-size:28px}
-.hidden{display:none!important}.login{max-width:440px;margin:12vh auto;padding:20px}table{width:100%;border-collapse:collapse;font-size:14px;table-layout:auto;min-width:100%}th,td{text-align:left;padding:10px 6px;border-bottom:1px solid #2b2e35;vertical-align:middle;white-space:nowrap}th{color:#aeb0b8}#reportHead th:first-child,#report td:first-child{width:82px}#reportHead th:nth-child(2),#report td:nth-child(2){width:92px}#reportHead th:nth-child(3),#report td:nth-child(3){width:72px}#reportHead th:nth-child(4),#report td:nth-child(4){width:65px}#reportHead th:last-child,#report td:last-child{width:82px}.collapse-btn{width:auto!important;padding:9px 13px;font-size:14px}.collapsed{display:none!important}
+.hidden{display:none!important}.login{max-width:440px;margin:12vh auto;padding:20px}.version{text-align:center;color:#666a73;font-size:11px;padding:8px 0 2px}table{width:100%;border-collapse:collapse;font-size:14px;table-layout:auto;min-width:100%}th,td{text-align:left;padding:10px 6px;border-bottom:1px solid #2b2e35;vertical-align:middle;white-space:nowrap}th{color:#aeb0b8}#reportHead th:first-child,#report td:first-child{width:82px}#reportHead th:nth-child(2),#report td:nth-child(2){width:92px}#reportHead th:nth-child(3),#report td:nth-child(3){width:72px}#reportHead th:nth-child(4),#report td:nth-child(4){width:65px}#reportHead th:last-child,#report td:last-child{width:82px}.collapse-btn{width:auto!important;padding:9px 13px;font-size:14px}.collapsed{display:none!important}
 @media(max-width:420px){h1{font-size:27px}.grid2{grid-template-columns:1fr}.entry{grid-template-columns:1fr}.entry .row{justify-content:flex-start}}
 </style>
 </head>
@@ -56,6 +56,8 @@ label{display:block;font-size:13px;color:#a9abb4;margin:0 0 7px}input,select{wid
 
 <div class="card"><div class="row"><strong>Dla księgowej</strong><button class="btn secondary small" id="copyBtn">Kopiuj tekst</button></div>
 <div style="overflow:auto;margin-top:10px"><table><thead id="reportHead"></thead><tbody id="report"></tbody></table></div></div>
+</div>
+  <div class="version">v1.12</div>
 </div>
 
 <script>
