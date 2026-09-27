@@ -11,7 +11,7 @@
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#111318,#0b0c0f);min-height:100vh}
 .wrap{max-width:680px;margin:auto;padding:20px 16px 40px}h1{font-size:30px;margin:8px 0 4px}.sub{color:#9b9da6;margin-bottom:22px}
 .card{background:#17191f;border:1px solid #292c34;border-radius:22px;padding:18px;margin:12px 0;box-shadow:0 8px 30px #0004}
-label{display:block;font-size:13px;color:#a9abb4;margin:0 0 7px}input,select{width:100%;background:#101217;color:#fff;border:1px solid #343741;border-radius:13px;padding:13px;font-size:17px;outline:none}input[type="date"]{text-align:center;min-height:52px}
+label{display:block;font-size:13px;color:#a9abb4;margin:0 0 7px}input,select{width:100%;background:#101217;color:#fff;border:1px solid #343741;border-radius:13px;padding:13px;font-size:17px;outline:none}input[type="date"]{text-align:left;min-height:52px;height:52px;line-height:24px;-webkit-appearance:none;appearance:none;display:block}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.time{display:grid;grid-template-columns:1fr 1fr;gap:8px}.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .check{display:flex;align-items:center;gap:10px;color:#ddd;font-size:16px}.check input{width:20px;height:20px;accent-color:#8fe388}
 .big{font-size:27px;font-weight:700}.muted{color:#999ca6}.btn{width:100%;border:0;border-radius:14px;padding:14px 16px;font-size:17px;font-weight:700;cursor:pointer}.primary{background:#e8e9ed;color:#111}.secondary{background:#272a31;color:#fff}.small{width:auto;padding:9px 12px;font-size:14px}
@@ -46,7 +46,7 @@ label{display:block;font-size:13px;color:#a9abb4;margin:0 0 7px}input,select{wid
 
 <div class="card"><div class="row"><strong>Okres rozliczeniowy</strong><button class="btn secondary small" id="currentMonthBtn">Bieżący</button></div>
 <div style="height:12px"></div><div class="grid2">
-<div><label>Okres kończący się</label><select id="filterMonth"></select></div><div><label>Rok</label><select id="filterYear"></select></div></div><div id="periodLabel" class="muted" style="margin-top:10px;font-size:13px"></div></div>
+<div><label>Miesiąc okresu</label><select id="filterMonth"></select></div><div><label>Rok</label><select id="filterYear"></select></div></div><div id="periodLabel" class="muted" style="margin-top:10px;font-size:13px"></div></div>
 
 <div class="card"><div class="row"><strong>Zapisane dni</strong><div class="row"><span class="muted" id="count"></span><button class="btn secondary small collapse-btn" id="toggleEntries">Pokaż</button></div></div>
 <div id="entries" class="collapsed" style="margin-top:4px"></div>
@@ -57,7 +57,7 @@ label{display:block;font-size:13px;color:#a9abb4;margin:0 0 7px}input,select{wid
 <div class="card"><div class="row"><strong>Dla księgowej</strong><button class="btn secondary small" id="copyBtn">Kopiuj tekst</button></div>
 <div style="overflow:auto;margin-top:10px"><table><thead id="reportHead"></thead><tbody id="report"></tbody></table></div></div>
 </div>
-  <div class="version">v1.12</div>
+  <div class="version">v1.13</div>
 </div>
 
 <script>
@@ -94,7 +94,7 @@ function copyText(){let shown=visibleEntries();if(!shown.length){showMsg("appMsg
 async function init(){
 fillTimes();let today=new Date();$("date").value=today.toISOString().slice(0,10);let y=today.getFullYear();
 for(let i=y-3;i<=y+2;i++){let o=document.createElement("option");o.value=i;o.textContent=i;$("filterYear").appendChild(o)}
-for(let i=1;i<=12;i++){let o=document.createElement("option");o.value=i;o.textContent=String(i).padStart(2,"0");$("filterMonth").appendChild(o)}$("filterMonth").value=today.getMonth()+1;$("filterYear").value=y;updateCalc();updatePeriodLabel();
+let monthNames=["Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec","Lipiec","Sierpień","Wrzesień","Październik","Listopad","Grudzień"];for(let i=1;i<=12;i++){let o=document.createElement("option");o.value=i;o.textContent=monthNames[i-1];$("filterMonth").appendChild(o)}$("filterMonth").value=today.getMonth()+1;$("filterYear").value=y;updateCalc();updatePeriodLabel();
 ["sh","sm","eh","em","break"].forEach(id=>$(id).addEventListener("change",updateCalc));["filterMonth","filterYear"].forEach(id=>$(id).addEventListener("change",()=>{updatePeriodLabel();render()}));
 $("currentMonthBtn").onclick=()=>{let d=new Date();$("filterMonth").value=d.getMonth()+1;$("filterYear").value=d.getFullYear();updatePeriodLabel();render()};
 $("saveBtn").onclick=save;$("copyBtn").onclick=copyText;$("toggleEntries").onclick=()=>{let e=$("entries");let hidden=e.classList.toggle("collapsed");$("toggleEntries").textContent=hidden?"Pokaż":"Ukryj"};
