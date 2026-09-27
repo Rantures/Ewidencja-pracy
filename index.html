@@ -44,11 +44,9 @@ label{display:block;font-size:13px;color:#a9abb4;margin:0 0 7px}input,select{wid
 <div style="height:14px"></div><button class="btn primary" id="saveBtn">Zapisz dzień</button><div id="appMsg" class="msg"></div>
 </div>
 
-<div class="card"><div class="row"><strong>Widok miesiąca</strong><button class="btn secondary small" id="currentMonthBtn">Bieżący</button></div>
+<div class="card"><div class="row"><strong>Okres rozliczeniowy</strong><button class="btn secondary small" id="currentMonthBtn">Bieżący</button></div>
 <div style="height:12px"></div><div class="grid2">
-<div><label>Miesiąc</label><select id="filterMonth">
-<option value="1">Styczeń</option><option value="2">Luty</option><option value="3">Marzec</option><option value="4">Kwiecień</option><option value="5">Maj</option><option value="6">Czerwiec</option><option value="7">Lipiec</option><option value="8">Sierpień</option><option value="9">Wrzesień</option><option value="10">Październik</option><option value="11">Listopad</option><option value="12">Grudzień</option>
-</select></div><div><label>Rok</label><select id="filterYear"></select></div></div></div>
+<div><label>Okres kończący się</label><select id="filterMonth"></select></div><div><label>Rok</label><select id="filterYear"></select></div></div><div id="periodLabel" class="muted" style="margin-top:10px;font-size:13px"></div></div>
 
 <div class="card"><div class="row"><strong>Zapisane dni</strong><span class="muted" id="count"></span></div>
 <div id="entries" style="margin-top:4px"></div>
@@ -73,7 +71,7 @@ function fmt(min){let h=Math.floor(min/60),m=min%60;return h+":"+String(m).padSt
 function showMsg(id,text,ok=false){let e=$(id);e.textContent=text;e.className="msg "+(ok?"ok":"err");e.style.display="block";setTimeout(()=>e.style.display="none",3500)}
 function updateCalc(){$("calc").textContent=fmt(workMinutes())}
 function nmin(v){return Math.round(Number(v||0)*60)}
-function visibleEntries(){let y=Number($("filterYear").value),m=Number($("filterMonth").value);return entries.filter(e=>{let d=e.work_date.split("-");return Number(d[0])===y&&Number(d[1])===m})}
+function periodBounds(){let y=Number($("filterYear").value),m=Number($("filterMonth").value);let end=new Date(y,m-1,20,12);let start=new Date(y,m-2,21,12);return {start,end}}function isoDate(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}function periodText(){let{start,end}=periodBounds();return String(start.getDate()).padStart(2,"0")+"."+String(start.getMonth()+1).padStart(2,"0")+"."+start.getFullYear()+" – "+String(end.getDate()).padStart(2,"0")+"."+String(end.getMonth()+1).padStart(2,"0")+"."+end.getFullYear()}function visibleEntries(){let{start,end}=periodBounds(),a=isoDate(start),b=isoDate(end);return entries.filter(e=>e.work_date>=a&&e.work_date<=b)}function updatePeriodLabel(){$("periodLabel").textContent=periodText()}
 
 async function loadEntries(){let{data,error}=await db.from("work_entries").select("*").order("work_date",{ascending:false});if(error){showMsg("appMsg","Nie udało się pobrać danych: "+error.message);return}entries=data||[];render()}
 function render(){
@@ -94,9 +92,9 @@ function copyText(){let shown=visibleEntries();if(!shown.length){showMsg("appMsg
 async function init(){
 fillTimes();let today=new Date();$("date").value=today.toISOString().slice(0,10);let y=today.getFullYear();
 for(let i=y-3;i<=y+2;i++){let o=document.createElement("option");o.value=i;o.textContent=i;$("filterYear").appendChild(o)}
-$("filterMonth").value=today.getMonth()+1;$("filterYear").value=y;updateCalc();
-["sh","sm","eh","em","break"].forEach(id=>$(id).addEventListener("change",updateCalc));["filterMonth","filterYear"].forEach(id=>$(id).addEventListener("change",render));
-$("currentMonthBtn").onclick=()=>{let d=new Date();$("filterMonth").value=d.getMonth()+1;$("filterYear").value=d.getFullYear();render()};
+for(let i=1;i<=12;i++){let o=document.createElement("option");o.value=i;o.textContent=String(i).padStart(2,"0");$("filterMonth").appendChild(o)}$("filterMonth").value=today.getMonth()+1;$("filterYear").value=y;updateCalc();updatePeriodLabel();
+["sh","sm","eh","em","break"].forEach(id=>$(id).addEventListener("change",updateCalc));["filterMonth","filterYear"].forEach(id=>$(id).addEventListener("change",()=>{updatePeriodLabel();render()}));
+$("currentMonthBtn").onclick=()=>{let d=new Date();$("filterMonth").value=d.getMonth()+1;$("filterYear").value=d.getFullYear();updatePeriodLabel();render()};
 $("saveBtn").onclick=save;$("copyBtn").onclick=copyText;
 $("entries").addEventListener("click",e=>{let b=e.target.closest(".delete");if(b)deleteEntry(b.dataset.id)});
 let{data:{session}}=await db.auth.getSession();if(session){$("loginView").classList.add("hidden");$("appView").classList.remove("hidden");$("userEmail").textContent=session.user.email;await loadEntries()}
