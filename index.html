@@ -37,7 +37,7 @@ label{display:block;font-size:13px;color:#a9abb4;margin:0 0 7px}input,select{wid
 <button class="btn primary" id="loginBtn">Zaloguj</button><div id="loginMsg" class="msg err"></div>
 </div></div>
 
-<div id="appView" class="wrap hidden"><div class="version" style="text-align:right;padding:0 4px 6px">v1.22</div>
+<div id="appView" class="wrap hidden"><div class="version" style="text-align:right;padding:0 4px 6px">v1.23</div>
 <div class="row"><div><h1>Ewidencja pracy</h1><div class="sub" id="userEmail"></div></div><button class="btn secondary small" id="logoutBtn">Wyloguj</button></div>
 <div class="navtabs"><button class="navtab active" id="hoursTab">Godziny</button><button class="navtab" id="dietTab">Diety</button></div>
 <div id="hoursView">
@@ -83,10 +83,10 @@ function dateIso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2
 function monday(d){let x=new Date(d),day=x.getDay();x.setDate(x.getDate()-(day===0?6:day-1));return x}
 function addDays(d,n){let x=new Date(d);x.setDate(x.getDate()+n);return x}
 function shortDate(d){return String(d.getDate()).padStart(2,"0")+"."+String(d.getMonth()+1).padStart(2,"0")}
-function isoWeekParts(d){let x=new Date(d);x.setHours(12,0,0,0);let day=x.getDay()||7;let th=new Date(x);th.setDate(x.getDate()+4-day);let y=th.getFullYear();let first=new Date(y,0,4,12);let firstDay=first.getDay()||7;let firstThursday=new Date(first);firstThursday.setDate(first.getDate()+4-firstDay);return {year:y,week:1+Math.round((th-firstThursday)/604800000)}}
+function isoWeekParts(d){let x=new Date(d);let u=new Date(Date.UTC(x.getFullYear(),x.getMonth(),x.getDate()));let day=u.getUTCDay()||7;u.setUTCDate(u.getUTCDate()+4-day);let year=u.getUTCFullYear();let yearStart=new Date(Date.UTC(year,0,1));let week=Math.ceil((((u-yearStart)/86400000)+1)/7);return {year,week}}
 function isoWeekYear(d){return isoWeekParts(d).year}
 function isoWeek(d){return isoWeekParts(d).week}
-function isoWeeksInYear(y){return isoWeek(new Date(y,11,28,12))}
+function isoWeeksInYear(y){return isoWeek(new Date(y,11,28))}
 function weekStartFromISO(y,w){let jan4=new Date(y,0,4,12);return monday(addDays(jan4,(w-1)*7))}
 function dietPeriodText(){let y=Number($("dietYear").value);return "Tygodnie ISO "+y+" (poniedziałek–niedziela)"}
 async function loadDietWeeks(){let{data,error}=await db.from("diet_weeks").select("*").order("week_start",{ascending:true});if(error){showMsg("appMsg","Nie udało się pobrać diet: "+error.message);return}dietWeeks=data||[];renderDiet()}
@@ -138,7 +138,7 @@ $("saveBtn").onclick=save;$("copyBtn").onclick=copyText;$("toggleEntries").oncli
 $("hoursTab").onclick=()=>{$("hoursTab").classList.add("active");$("dietTab").classList.remove("active");$("hoursView").classList.remove("hidden");$("dietView").classList.add("hidden")};
 $("dietTab").onclick=async()=>{$("dietTab").classList.add("active");$("hoursTab").classList.remove("active");$("hoursView").classList.add("hidden");$("dietView").classList.remove("hidden");await loadDietWeeks()};
 $("dietWeeks").addEventListener("click",async e=>{let b=e.target.closest(".diet-toggle");if(b){e.stopPropagation();await toggleDiet(b.dataset.week);return}let card=e.target.closest(".diet-week");if(card){let key=card.dataset.open;openDietWeek=openDietWeek===key?null:key;renderDiet()}});
-$("dietCurrentBtn").onclick=()=>{let now=new Date(),p=isoWeekParts(now);$("dietYear").value=p.year;openDietWeek=null;renderDiet();setTimeout(()=>$("currentDietWeek")?.scrollIntoView({behavior:"smooth",block:"center"}),50)};
+$("dietCurrentBtn").onclick=()=>{let p=isoWeekParts(new Date());$("dietYear").value=String(p.year);openDietWeek=null;renderDiet();requestAnimationFrame(()=>requestAnimationFrame(()=>{$("currentDietWeek")?.scrollIntoView({behavior:"smooth",block:"center"})}))};
 $("entries").addEventListener("click",e=>{let b=e.target.closest(".delete");if(b)deleteEntry(b.dataset.id)});
 for(let i=y-3;i<=y+2;i++){let o=document.createElement("option");o.value=i;o.textContent=i;$("dietYear").appendChild(o)}
 $("dietYear").value=y;
