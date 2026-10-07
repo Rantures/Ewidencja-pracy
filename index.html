@@ -37,7 +37,7 @@ label{display:block;font-size:13px;color:#a9abb4;margin:0 0 7px}input,select{wid
 <button class="btn primary" id="loginBtn">Zaloguj</button><div id="loginMsg" class="msg err"></div>
 </div></div>
 
-<div id="appView" class="wrap hidden"><div class="version" style="text-align:right;padding:0 4px 6px">v1.18</div>
+<div id="appView" class="wrap hidden"><div class="version" style="text-align:right;padding:0 4px 6px">v1.19</div>
 <div class="row"><div><h1>Ewidencja pracy</h1><div class="sub" id="userEmail"></div></div><button class="btn secondary small" id="logoutBtn">Wyloguj</button></div>
 <div class="navtabs"><button class="navtab active" id="hoursTab">Godziny</button><button class="navtab" id="dietTab">Diety</button></div>
 <div id="hoursView">
@@ -83,9 +83,9 @@ function dateIso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2
 function monday(d){let x=new Date(d),day=x.getDay();x.setDate(x.getDate()-(day===0?6:day-1));return x}
 function addDays(d,n){let x=new Date(d);x.setDate(x.getDate()+n);return x}
 function shortDate(d){return String(d.getDate()).padStart(2,"0")+"."+String(d.getMonth()+1).padStart(2,"0")}
-function isoWeekYear(d){let x=new Date(d);x.setHours(12,0,0,0);x.setDate(x.getDate()+4-(x.getDay()||7));return x.getFullYear()}
-function isoWeek(d){let x=new Date(d);x.setHours(12,0,0,0);x.setDate(x.getDate()+4-(x.getDay()||7));let y=x.getFullYear(),jan4=new Date(y,0,4,12);return Math.ceil((((x-jan4)/86400000)+jan4.getDay()+1)/7)}
-function isoWeeksInYear(y){let d=new Date(y,11,28,12);return isoWeek(d)}
+function isoWeekYear(d){let x=new Date(d);x.setHours(12,0,0,0);let day=x.getDay()||7;x.setDate(x.getDate()+4-day);return x.getFullYear()}
+function isoWeek(d){let x=new Date(d);x.setHours(12,0,0,0);let day=x.getDay()||7;x.setDate(x.getDate()+4-day);let jan4=new Date(x.getFullYear(),0,4,12);return Math.floor((x-jan4)/604800000)+1}
+function isoWeeksInYear(y){return isoWeek(new Date(y,11,28,12))}
 function weekStartFromISO(y,w){let jan4=new Date(y,0,4,12);return monday(addDays(jan4,(w-1)*7))}
 function dietPeriodText(){let y=Number($("dietYear").value);return "Tygodnie ISO "+y+" (poniedziałek–niedziela)"}
 async function loadDietWeeks(){let{data,error}=await db.from("diet_weeks").select("*").order("week_start",{ascending:true});if(error){showMsg("appMsg","Nie udało się pobrać diet: "+error.message);return}dietWeeks=data||[];renderDiet()}
@@ -96,7 +96,7 @@ function renderDiet(){
  let received=0;
  $("dietWeeks").innerHTML=weeks.map((w,i)=>{let key=dateIso(w.start),saved=dietWeeks.find(x=>x.week_start===key),isReceived=!!saved?.received,isCurrent=y===currentYear&&w.num===currentWeek;if(isReceived)received++;let es=weekEntries(w.start,w.end),total=es.reduce((s,e)=>s+nmin(e.hours),0),open=openDietWeek===key;
  let details=open?'<div class="diet-details">'+(es.length?es.map(e=>'<div class="diet-day"><span><strong>'+shortDate(dateObj(e.work_date))+'</strong> <span class="muted">'+e.start_time.slice(0,5)+'–'+e.end_time.slice(0,5)+'</span></span><strong>'+fmt(nmin(e.hours))+'</strong></div>').join(""):'<div class="muted" style="padding:8px 0">Brak pracy w tym tygodniu.</div>')+'<div class="diet-actions"><button class="btn '+(isReceived?"secondary":"primary")+' small diet-toggle" data-week="'+key+'">'+(isReceived?"↩ Oznacz jako nieotrzymaną":"✅ Otrzymałem dietę")+'</button></div></div>':'';
- return '<div class="diet-week '+(isReceived?"received":"")+'" data-open="'+key+'"><div class="week-main"><div><div class="week-title">'+(isReceived?"🟩":"⬜")+' Tydzień '+(i+1)+'</div><div class="week-date">'+shortDate(w.start)+' – '+shortDate(w.end)+'</div></div><div><div class="week-hours">'+fmt(total)+'</div><div class="week-status">'+(isReceived?"Dieta otrzymana":"Dieta niepotwierdzona")+'</div></div></div>'+details+'</div>'}).join("");
+ return '<div class="diet-week '+(isReceived?"received ":"")+(isCurrent?"current":"")+'" data-open="'+key+'"><div class="week-main"><div><div class="week-title">'+(isReceived?"🟩":"⬜")+' Tydzień '+w.num+(isCurrent?'<span class="current-badge">AKTUALNY</span>':"")+'</div><div class="week-date">'+shortDate(w.start)+' – '+shortDate(w.end)+'</div></div><div><div class="week-hours">'+fmt(total)+'</div><div class="week-status">'+(isReceived?"Dieta otrzymana":"Dieta niepotwierdzona")+'</div></div></div>'+details+'</div>'}).join("");
  $("dietReceivedCount").textContent=received;$("dietMissingCount").textContent=weeks.length-received;
 }
 async function toggleDiet(weekStart){let{data:{user}}=await db.auth.getUser();if(!user)return;let existing=dietWeeks.find(x=>x.week_start===weekStart),received=!existing?.received;
