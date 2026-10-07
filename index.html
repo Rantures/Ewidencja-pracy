@@ -37,7 +37,7 @@ label{display:block;font-size:13px;color:#a9abb4;margin:0 0 7px}input,select{wid
 <button class="btn primary" id="loginBtn">Zaloguj</button><div id="loginMsg" class="msg err"></div>
 </div></div>
 
-<div id="appView" class="wrap hidden"><div class="version" style="text-align:right;padding:0 4px 6px">v1.19</div>
+<div id="appView" class="wrap hidden"><div class="version" style="text-align:right;padding:0 4px 6px">v1.20</div>
 <div class="row"><div><h1>Ewidencja pracy</h1><div class="sub" id="userEmail"></div></div><button class="btn secondary small" id="logoutBtn">Wyloguj</button></div>
 <div class="navtabs"><button class="navtab active" id="hoursTab">Godziny</button><button class="navtab" id="dietTab">Diety</button></div>
 <div id="hoursView">
@@ -84,7 +84,7 @@ function monday(d){let x=new Date(d),day=x.getDay();x.setDate(x.getDate()-(day==
 function addDays(d,n){let x=new Date(d);x.setDate(x.getDate()+n);return x}
 function shortDate(d){return String(d.getDate()).padStart(2,"0")+"."+String(d.getMonth()+1).padStart(2,"0")}
 function isoWeekYear(d){let x=new Date(d);x.setHours(12,0,0,0);let day=x.getDay()||7;x.setDate(x.getDate()+4-day);return x.getFullYear()}
-function isoWeek(d){let x=new Date(d);x.setHours(12,0,0,0);let day=x.getDay()||7;x.setDate(x.getDate()+4-day);let jan4=new Date(x.getFullYear(),0,4,12);return Math.floor((x-jan4)/604800000)+1}
+function isoWeek(d){let x=new Date(d);x.setHours(12,0,0,0);let day=x.getDay()||7;let thursday=new Date(x);thursday.setDate(x.getDate()+4-day);let jan4=new Date(thursday.getFullYear(),0,4,12);let jan4day=jan4.getDay()||7;let week1Monday=new Date(jan4);week1Monday.setDate(jan4.getDate()-(jan4day-1));return Math.floor((monday(thursday)-week1Monday)/604800000)+1}
 function isoWeeksInYear(y){return isoWeek(new Date(y,11,28,12))}
 function weekStartFromISO(y,w){let jan4=new Date(y,0,4,12);return monday(addDays(jan4,(w-1)*7))}
 function dietPeriodText(){let y=Number($("dietYear").value);return "Tygodnie ISO "+y+" (poniedziałek–niedziela)"}
