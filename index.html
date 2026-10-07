@@ -24,8 +24,8 @@ label{display:block;font-size:13px;color:#a9abb4;margin:0 0 7px}input,select{wid
 
 .navtabs{display:flex;gap:8px;background:#17191f;border:1px solid #292c34;border-radius:16px;padding:5px;margin:12px 0}
 .navtab{flex:1;border:0;background:transparent;color:#9b9da6;border-radius:12px;padding:11px;font-size:15px;font-weight:700}.navtab.active{background:#e8e9ed;color:#111}
-.diet-week{border:1px solid #292c34;border-radius:18px;padding:15px;margin:10px 0;background:#17191f;cursor:pointer}.diet-week.received{background:#17301e;border-color:#315f39}.diet-week.current{border:2px solid #e8e9ed;box-shadow:0 0 0 2px #e8e9ed22}.diet-week.current .week-title{font-weight:900}.current-badge{display:inline-block;margin-left:6px;background:#e8e9ed;color:#111;border-radius:7px;padding:2px 6px;font-size:11px;font-weight:800;vertical-align:2px}
-.diet-week .week-main{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}.diet-week .week-title{font-weight:700;font-size:17px}.diet-week .week-date{color:#9b9da6;font-size:13px;margin-top:3px}.diet-week .week-hours{font-size:20px;font-weight:700;text-align:right}.diet-week .week-status{font-size:12px;margin-top:3px;text-align:right;color:#9b9da6}.diet-week.received .week-status{color:#b9efc2}
+.diet-week{border:1px solid #292c34;border-radius:18px;padding:15px;margin:10px 0;background:#17191f;cursor:pointer}.diet-week.received{background:#17301e;border-color:#315f39}.diet-week.home{background:#14283a;border-color:#2f6f9f}.diet-week.current{border:2px solid #e8e9ed;box-shadow:0 0 0 2px #e8e9ed22}.diet-week.current .week-title{font-weight:900}.current-badge{display:inline-block;margin-left:6px;background:#e8e9ed;color:#111;border-radius:7px;padding:2px 6px;font-size:11px;font-weight:800;vertical-align:2px}
+.diet-week .week-main{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}.diet-week .week-title{font-weight:700;font-size:17px}.diet-week .week-date{color:#9b9da6;font-size:13px;margin-top:3px}.diet-week .week-hours{font-size:20px;font-weight:700;text-align:right}.diet-week .week-status{font-size:12px;margin-top:3px;text-align:right;color:#9b9da6}.diet-week.received .week-status{color:#b9efc2}.diet-week.home .week-status{color:#9bd7ff}
 .diet-details{border-top:1px solid #315f39;margin-top:13px;padding-top:11px}.diet-day{display:flex;justify-content:space-between;gap:8px;padding:7px 0;font-size:14px}.diet-day .muted{font-size:13px}.diet-actions{display:flex;gap:8px;margin-top:12px}.diet-actions button{flex:1}.diet-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px}.diet-summary .mini{background:#17191f;border:1px solid #292c34;border-radius:15px;padding:13px}.diet-summary .mini strong{display:block;font-size:22px;margin-top:3px}
 </style>
 </head>
@@ -37,7 +37,7 @@ label{display:block;font-size:13px;color:#a9abb4;margin:0 0 7px}input,select{wid
 <button class="btn primary" id="loginBtn">Zaloguj</button><div id="loginMsg" class="msg err"></div>
 </div></div>
 
-<div id="appView" class="wrap hidden"><div class="version" style="text-align:right;padding:0 4px 6px">v1.23</div>
+<div id="appView" class="wrap hidden"><div class="version" style="text-align:right;padding:0 4px 6px">v1.24</div>
 <div class="row"><div><h1>Ewidencja pracy</h1><div class="sub" id="userEmail"></div></div><button class="btn secondary small" id="logoutBtn">Wyloguj</button></div>
 <div class="navtabs"><button class="navtab active" id="hoursTab">Godziny</button><button class="navtab" id="dietTab">Diety</button></div>
 <div id="hoursView">
@@ -70,7 +70,7 @@ label{display:block;font-size:13px;color:#a9abb4;margin:0 0 7px}input,select{wid
 <div style="height:12px"></div><div><label>Rok</label><select id="dietYear"></select></div>
 <div id="dietPeriodLabel" class="muted" style="margin-top:10px;font-size:13px"></div></div>
 <div id="dietWeeks"></div>
-<div class="card diet-summary"><div class="mini"><span class="muted">Diety otrzymane</span><strong id="dietReceivedCount">0</strong></div><div class="mini"><span class="muted">Diety brakujące</span><strong id="dietMissingCount">0</strong></div></div>
+<div class="card diet-summary"><div class="mini"><span class="muted">Diety otrzymane</span><strong id="dietReceivedCount">0</strong></div><div class="mini"><span class="muted">Byłem w domu</span><strong id="dietHomeCount">0</strong></div><div class="mini" style="grid-column:1/-1"><span class="muted">Bez oznaczenia</span><strong id="dietMissingCount">0</strong></div></div>
 </div>
 </div>
 <script>
@@ -94,14 +94,15 @@ function weekEntries(start,end){let a=dateIso(start),b=dateIso(end);return entri
 function renderDiet(){
  let y=Number($("dietYear").value);$("dietPeriodLabel").textContent=dietPeriodText();let weeks=[],count=isoWeeksInYear(y),now=new Date(),currentYear=isoWeekYear(now),currentWeek=isoWeek(now);
  for(let w=1;w<=count;w++){let ws=weekStartFromISO(y,w),we=addDays(ws,6);weeks.push({start:ws,end:we,num:w})}
- let received=0;
- $("dietWeeks").innerHTML=weeks.map((w,i)=>{let key=dateIso(w.start),saved=dietWeeks.find(x=>x.week_start===key),isReceived=!!saved?.received,isCurrent=y===currentYear&&w.num===currentWeek;if(isReceived)received++;let es=weekEntries(w.start,w.end),total=es.reduce((s,e)=>s+nmin(e.hours),0),open=openDietWeek===key;
- let details=open?'<div class="diet-details">'+(es.length?es.map(e=>'<div class="diet-day"><span><strong>'+shortDate(dateObj(e.work_date))+'</strong> <span class="muted">'+e.start_time.slice(0,5)+'–'+e.end_time.slice(0,5)+'</span></span><strong>'+fmt(nmin(e.hours))+'</strong></div>').join(""):'<div class="muted" style="padding:8px 0">Brak pracy w tym tygodniu.</div>')+'<div class="diet-actions"><button class="btn '+(isReceived?"secondary":"primary")+' small diet-toggle" data-week="'+key+'">'+(isReceived?"↩ Oznacz jako nieotrzymaną":"✅ Otrzymałem dietę")+'</button></div></div>':'';
- return '<div id="'+(isCurrent?"currentDietWeek":"")+'" class="diet-week '+(isReceived?"received ":"")+(isCurrent?"current":"")+'" data-open="'+key+'"><div class="week-main"><div><div class="week-title">'+(isReceived?"🟩":"⬜")+' Tydzień '+w.num+(isCurrent?'<span class="current-badge">AKTUALNY</span>':"")+'</div><div class="week-date">'+shortDate(w.start)+' – '+shortDate(w.end)+'</div></div><div><div class="week-hours">'+fmt(total)+'</div><div class="week-status">'+(isReceived?"Dieta otrzymana":"Dieta niepotwierdzona")+'</div></div></div>'+details+'</div>'}).join("");
- $("dietReceivedCount").textContent=received;$("dietMissingCount").textContent=weeks.length-received;
+ let received=0,home=0;
+ $("dietWeeks").innerHTML=weeks.map((w,i)=>{let key=dateIso(w.start),saved=dietWeeks.find(x=>x.week_start===key),isReceived=!!saved?.received,isHome=!!saved?.at_home&&!isReceived,isCurrent=y===currentYear&&w.num===currentWeek;if(isReceived)received++;if(isHome)home++;let es=weekEntries(w.start,w.end),total=es.reduce((s,e)=>s+nmin(e.hours),0),open=openDietWeek===key;
+ let details=open?'<div class="diet-details">'+(es.length?es.map(e=>'<div class="diet-day"><span><strong>'+shortDate(dateObj(e.work_date))+'</strong> <span class="muted">'+e.start_time.slice(0,5)+'–'+e.end_time.slice(0,5)+'</span></span><strong>'+fmt(nmin(e.hours))+'</strong></div>').join(""):'<div class="muted" style="padding:8px 0">Brak pracy w tym tygodniu.</div>')+'<div class="diet-actions"><button class="btn '+(isReceived?"secondary":"primary")+' small diet-toggle" data-week="'+key+'" data-status="received">'+(isReceived?"↩ Usuń oznaczenie":"✅ Otrzymałem dietę")+'</button><button class="btn '+(isHome?"secondary":"secondary")+' small diet-toggle" data-week="'+key+'" data-status="home">'+(isHome?"↩ Usuń oznaczenie":"🏠 Byłem w domu")+'</button></div></div>':'';
+ return '<div id="'+(isCurrent?"currentDietWeek":"")+'" class="diet-week '+(isReceived?"received ":(isHome?"home ":""))+(isCurrent?"current":"")+'" data-open="'+key+'"><div class="week-main"><div><div class="week-title">'+(isReceived?"🟩":(isHome?"🟦":"⬜"))+' Tydzień '+w.num+(isCurrent?'<span class="current-badge">AKTUALNY</span>':"")+'</div><div class="week-date">'+shortDate(w.start)+' – '+shortDate(w.end)+'</div></div><div><div class="week-hours">'+fmt(total)+'</div><div class="week-status">'+(isReceived?"Dieta otrzymana":(isHome?"Byłem w domu":"Dieta nieoznaczona"))+'</div></div></div>'+details+'</div>'}).join("");
+ $("dietReceivedCount").textContent=received;$("dietHomeCount").textContent=home;$("dietMissingCount").textContent=weeks.length-received-home;
 }
-async function toggleDiet(weekStart){let{data:{user}}=await db.auth.getUser();if(!user)return;let existing=dietWeeks.find(x=>x.week_start===weekStart),received=!existing?.received;
- let{error}=await db.from("diet_weeks").upsert({user_id:user.id,week_start:weekStart,week_end:dateIso(addDays(dateObj(weekStart),6)),received},{onConflict:"user_id,week_start"});if(error){showMsg("appMsg","Nie udało się zapisać diety: "+error.message);return}await loadDietWeeks()}
+async function toggleDiet(weekStart,status){let{data:{user}}=await db.auth.getUser();if(!user)return;let existing=dietWeeks.find(x=>x.week_start===weekStart),received=!!existing?.received,at_home=!!existing?.at_home;
+ if(status==="received"){received=!received;at_home=false}else{at_home=!at_home;received=false}
+ let{error}=await db.from("diet_weeks").upsert({user_id:user.id,week_start:weekStart,week_end:dateIso(addDays(dateObj(weekStart),6)),received,at_home},{onConflict:"user_id,week_start"});if(error){showMsg("appMsg","Nie udało się zapisać oznaczenia: "+error.message);return}await loadDietWeeks()}
 
 function fillTimes(){for(let h=0;h<24;h++)for(const id of["sh","eh"]){let o=document.createElement("option");o.value=String(h).padStart(2,"0");o.textContent=o.value;$(id).appendChild(o)}for(const m of[0,30])for(const id of["sm","em"]){let o=document.createElement("option");o.value=String(m).padStart(2,"0");o.textContent=o.value;$(id).appendChild(o)}$("sh").value="06";$("eh").value="18"}
 function minutes(h,m){return Number(h)*60+Number(m)}
@@ -137,7 +138,7 @@ $("currentMonthBtn").onclick=()=>{let d=new Date(),pm=d.getDate()>=21?d.getMonth
 $("saveBtn").onclick=save;$("copyBtn").onclick=copyText;$("toggleEntries").onclick=()=>{let e=$("entries");let hidden=e.classList.toggle("collapsed");$("toggleEntries").textContent=hidden?"Pokaż":"Ukryj"};
 $("hoursTab").onclick=()=>{$("hoursTab").classList.add("active");$("dietTab").classList.remove("active");$("hoursView").classList.remove("hidden");$("dietView").classList.add("hidden")};
 $("dietTab").onclick=async()=>{$("dietTab").classList.add("active");$("hoursTab").classList.remove("active");$("hoursView").classList.add("hidden");$("dietView").classList.remove("hidden");await loadDietWeeks()};
-$("dietWeeks").addEventListener("click",async e=>{let b=e.target.closest(".diet-toggle");if(b){e.stopPropagation();await toggleDiet(b.dataset.week);return}let card=e.target.closest(".diet-week");if(card){let key=card.dataset.open;openDietWeek=openDietWeek===key?null:key;renderDiet()}});
+$("dietWeeks").addEventListener("click",async e=>{let b=e.target.closest(".diet-toggle");if(b){e.stopPropagation();await toggleDiet(b.dataset.week,b.dataset.status);return}let card=e.target.closest(".diet-week");if(card){let key=card.dataset.open;openDietWeek=openDietWeek===key?null:key;renderDiet()}});
 $("dietCurrentBtn").onclick=()=>{let p=isoWeekParts(new Date());$("dietYear").value=String(p.year);openDietWeek=null;renderDiet();requestAnimationFrame(()=>requestAnimationFrame(()=>{$("currentDietWeek")?.scrollIntoView({behavior:"smooth",block:"center"})}))};
 $("entries").addEventListener("click",e=>{let b=e.target.closest(".delete");if(b)deleteEntry(b.dataset.id)});
 for(let i=y-3;i<=y+2;i++){let o=document.createElement("option");o.value=i;o.textContent=i;$("dietYear").appendChild(o)}
