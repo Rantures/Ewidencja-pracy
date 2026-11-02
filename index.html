@@ -37,7 +37,7 @@ label{display:block;font-size:13px;color:#a9abb4;margin:0 0 7px}input,select{wid
 <button class="btn primary" id="loginBtn">Zaloguj</button><div id="loginMsg" class="msg err"></div>
 </div></div>
 
-<div id="appView" class="wrap hidden"><div class="version" style="text-align:right;padding:0 4px 6px">v1.27</div>
+<div id="appView" class="wrap hidden"><div class="version" style="text-align:right;padding:0 4px 6px">v1.28</div>
 <div class="row"><div><h1>Ewidencja pracy</h1><div class="sub" id="userEmail"></div></div><button class="btn secondary small" id="logoutBtn">Wyloguj</button></div>
 <div class="navtabs"><button class="navtab active" id="hoursTab">Godziny</button><button class="navtab" id="dietTab">Diety</button></div>
 <div id="hoursView">
@@ -76,7 +76,7 @@ label{display:block;font-size:13px;color:#a9abb4;margin:0 0 7px}input,select{wid
 <script>
 const SUPABASE_URL="https://sofqzwpfsoeysouvklkm.supabase.co";
 const SUPABASE_KEY="sb_publishable_k6BT46z0PkYpDq7a1Nx7yw_1r1tV641";
-const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}});
 const $=id=>document.getElementById(id);let entries=[],dietWeeks=[],openDietWeek=null,calendarMonth=new Date();
 function prettyDate(s){if(!s)return "Wybierz datę";let d=dateObj(s);return String(d.getDate()).padStart(2,"0")+"."+String(d.getMonth()+1).padStart(2,"0")+"."+d.getFullYear()}
 function renderCalendar(){let selected=$("date").value;let y=calendarMonth.getFullYear(),m=calendarMonth.getMonth();$("calMonthLabel").textContent=new Intl.DateTimeFormat("pl-PL",{month:"long",year:"numeric"}).format(new Date(y,m,1));let first=new Date(y,m,1,12),offset=(first.getDay()+6)%7,start=addDays(first,-offset),today=dateIso(new Date());let out="";for(let i=0;i<42;i++){let d=addDays(start,i),iso=dateIso(d),entry=entries.some(e=>e.work_date===iso),ws=dateIso(monday(d)),week=dietWeeks.find(x=>x.week_start===ws),isHome=!!week?.at_home&&!week?.received;let cls="cal-day";if(d.getMonth()!==m)cls+=" other";if(entry)cls+=" worked";else if(isHome)cls+=" home";if(iso===selected)cls+=" selected";if(iso===today)cls+=" today";out+='<button type="button" class="'+cls+'" data-date="'+iso+'">'+d.getDate()+'</button>'} $("calDays").innerHTML=out;$("dateDisplay").textContent=prettyDate(selected)}
