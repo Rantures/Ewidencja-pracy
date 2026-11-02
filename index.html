@@ -37,12 +37,12 @@ label{display:block;font-size:13px;color:#a9abb4;margin:0 0 7px}input,select{wid
 <button class="btn primary" id="loginBtn">Zaloguj</button><div id="loginMsg" class="msg err"></div>
 </div></div>
 
-<div id="appView" class="wrap hidden"><div class="version" style="text-align:right;padding:0 4px 6px">v1.26</div>
+<div id="appView" class="wrap hidden"><div class="version" style="text-align:right;padding:0 4px 6px">v1.27</div>
 <div class="row"><div><h1>Ewidencja pracy</h1><div class="sub" id="userEmail"></div></div><button class="btn secondary small" id="logoutBtn">Wyloguj</button></div>
 <div class="navtabs"><button class="navtab active" id="hoursTab">Godziny</button><button class="navtab" id="dietTab">Diety</button></div>
 <div id="hoursView">
 <div class="card">
-<div class="grid2"><div><label>Data</label><div class="date-picker"><button type="button" id="dateDisplay" class="date-display"></button><div id="workCalendar" class="work-calendar"><div class="cal-head"><button type="button" id="calPrev" aria-label="Poprzedni miesiąc">‹</button><strong id="calMonthLabel"></strong><button type="button" id="calNext" aria-label="Następny miesiąc">›</button></div><div class="cal-grid cal-weekdays"><span>Pn</span><span>Wt</span><span>Śr</span><span>Cz</span><span>Pt</span><span>So</span><span>Nd</span></div><div id="calDays" class="cal-grid"></div><div class="cal-legend"><span><i class="legend-dot worked"></i> Praca</span><span><i class="legend-dot home"></i> Dom</span><span><i class="legend-dot empty"></i> Brak wpisu</span></div></div></div></div>
+<div class="grid2"><div><label>Data</label><div class="date-picker"><input id="date" type="date" class="hidden" aria-hidden="true" tabindex="-1"><button type="button" id="dateDisplay" class="date-display">Wybierz datę</button><div id="workCalendar" class="work-calendar"><div class="cal-head"><button type="button" id="calPrev" aria-label="Poprzedni miesiąc">‹</button><strong id="calMonthLabel"></strong><button type="button" id="calNext" aria-label="Następny miesiąc">›</button></div><div class="cal-grid cal-weekdays"><span>Pn</span><span>Wt</span><span>Śr</span><span>Cz</span><span>Pt</span><span>So</span><span>Nd</span></div><div id="calDays" class="cal-grid"></div><div class="cal-legend"><span><i class="legend-dot worked"></i> Praca</span><span><i class="legend-dot home"></i> Dom</span><span><i class="legend-dot empty"></i> Brak wpisu</span></div></div></div></div>
 <div><label>Przerwa</label><label class="check" style="margin-top:9px"><input id="break" type="checkbox" checked> 30 minut</label></div></div>
 <div style="height:14px"></div>
 <div class="grid2"><div><label>Od</label><div class="time"><select id="sh"></select><select id="sm"></select></div></div>
