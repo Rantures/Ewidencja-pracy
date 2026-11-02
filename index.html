@@ -25,22 +25,24 @@ label{display:block;font-size:13px;color:#a9abb4;margin:0 0 7px}input,select{wid
 .cal-head button:active{transform:scale(.9);background:#ffffff20}
 .cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
 .cal-weekdays{color:#a7aab5;text-align:center;font-size:11px;font-weight:650;margin-bottom:8px}
-.cal-day{height:39px;min-width:0;border:1px solid transparent;border-radius:50%;background:transparent;color:#f5f5f7;font-size:14px;font-weight:550;padding:0;display:grid;place-items:center;transition:background .18s,border-color .18s,transform .18s,box-shadow .18s; -webkit-tap-highlight-color:transparent}
-.cal-day:active{transform:scale(.88)}
+.cal-day{height:39px;min-width:0;border:1px solid transparent;border-radius:50%;background:transparent;color:#f5f5f7;font-size:14px;font-weight:500;padding:0;display:grid;place-items:center;transition:color .18s,background .18s,border-color .18s,transform .18s,box-shadow .18s;-webkit-tap-highlight-color:transparent}
+.cal-day:active{transform:scale(.92)}
 .cal-day.other{opacity:.28}
-.cal-day.worked{background:linear-gradient(145deg,#287a43,#1b5932);border-color:#55bd70;color:#f3fff5;box-shadow:inset 0 1px 0 #ffffff20}
-.cal-day.home{background:linear-gradient(145deg,#206b9c,#16496c);border-color:#51a7e0;color:#f1f9ff;box-shadow:inset 0 1px 0 #ffffff20}
-.cal-day.worked.home{background:linear-gradient(135deg,#287a43 0 50%,#206b9c 50% 100%);border-color:#7cc4b0}
-.cal-day.selected{outline:2px solid #fff;outline-offset:2px;font-weight:850;box-shadow:0 0 0 4px #ffffff12}
-.cal-day.today:not(.selected){box-shadow:inset 0 0 0 1px #ffffffb0}
-.cal-day.today.selected{box-shadow:0 0 0 4px #ffffff12,inset 0 0 0 1px #ffffffb0}
+.cal-day.worked{color:#65d889;font-weight:650}
+.cal-day.home{color:#63bfff;font-weight:650}
+.cal-day.worked.home{color:#76d6bd}
+.cal-day.selected{background:#ffffff18;border-color:#ffffff25;outline:none;font-weight:750;box-shadow:inset 0 1px 0 #ffffff12}
+.cal-day.selected.worked{color:#75e397}
+.cal-day.selected.home{color:#83ceff}
+.cal-day.today:not(.selected){text-decoration:underline;text-decoration-color:#9ca3af;text-decoration-thickness:1px;text-underline-offset:4px}
+.cal-day.today.selected{box-shadow:inset 0 0 0 1px #ffffff30}
 .cal-legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:15px;padding-top:12px;border-top:1px solid #ffffff12;font-size:11px;color:#c6c8d0}
 .cal-legend span{display:flex;align-items:center;gap:5px}
 .legend-dot{width:9px;height:9px;border-radius:50%;display:inline-block;box-shadow:0 0 0 2px #ffffff0a}
 .legend-dot.worked{background:#3b9955}.legend-dot.home{background:#388bc4}.legend-dot.empty{background:#777}
 .cal-grid.month-change{animation:monthSlide .2s ease both}
 @keyframes monthSlide{from{opacity:.45;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-@media(hover:hover){.cal-day:hover{background:#ffffff12}.cal-day.worked:hover{background:#328b4d}.cal-day.home:hover{background:#247fb6}.cal-head button:hover{background:#ffffff18;border-color:#ffffff20}}
+@media(hover:hover){.cal-day:hover{background:#ffffff0c}.cal-day.worked:hover{color:#8af0a6}.cal-day.home:hover{color:#8ad2ff}.cal-head button:hover{background:#ffffff18;border-color:#ffffff20}}
 @media(prefers-reduced-motion:reduce){.work-calendar.open,.cal-grid.month-change{animation:none}.cal-day,.cal-head button,.date-display{transition:none}}.time{display:grid;grid-template-columns:1fr 1fr;gap:8px}.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .check{display:flex;align-items:center;gap:10px;color:#ddd;font-size:16px}.check input{width:20px;height:20px;accent-color:#8fe388}
 .big{font-size:27px;font-weight:700}.muted{color:#999ca6}.btn{width:100%;border:0;border-radius:14px;padding:14px 16px;font-size:17px;font-weight:700;cursor:pointer}.primary{background:#e8e9ed;color:#111}.secondary{background:#272a31;color:#fff}.small{width:auto;padding:9px 12px;font-size:14px}
@@ -66,7 +68,7 @@ label{display:block;font-size:13px;color:#a9abb4;margin:0 0 7px}input,select{wid
 <button class="btn primary" id="loginBtn">Zaloguj</button><div id="loginMsg" class="msg err"></div>
 </div></div>
 
-<div id="appView" class="wrap hidden"><div class="version" style="text-align:right;padding:0 4px 6px">v1.30</div>
+<div id="appView" class="wrap hidden"><div class="version" style="text-align:right;padding:0 4px 6px">v1.31</div>
 <div class="row"><div><h1>Ewidencja pracy</h1><div class="sub" id="userEmail"></div></div><button class="btn secondary small" id="logoutBtn">Wyloguj</button></div>
 <div class="navtabs"><button class="navtab active" id="hoursTab">Godziny</button><button class="navtab" id="dietTab">Diety</button></div>
 <div id="hoursView">
