@@ -37,7 +37,7 @@ label{display:block;font-size:13px;color:#a9abb4;margin:0 0 7px}input,select{wid
 <button class="btn primary" id="loginBtn">Zaloguj</button><div id="loginMsg" class="msg err"></div>
 </div></div>
 
-<div id="appView" class="wrap hidden"><div class="version" style="text-align:right;padding:0 4px 6px">v1.25</div>
+<div id="appView" class="wrap hidden"><div class="version" style="text-align:right;padding:0 4px 6px">v1.26</div>
 <div class="row"><div><h1>Ewidencja pracy</h1><div class="sub" id="userEmail"></div></div><button class="btn secondary small" id="logoutBtn">Wyloguj</button></div>
 <div class="navtabs"><button class="navtab active" id="hoursTab">Godziny</button><button class="navtab" id="dietTab">Diety</button></div>
 <div id="hoursView">
@@ -150,7 +150,7 @@ $("dietYear").value=y;
 $("dietYear").addEventListener("change",()=>{openDietWeek=null;renderDiet()});
 let{data:{session}}=await db.auth.getSession();if(session){$("loginView").classList.add("hidden");$("appView").classList.remove("hidden");$("userEmail").textContent=session.user.email;await loadEntries()}
 }
-$("loginBtn").onclick=async()=>{let{error}=await db.auth.signInWithPassword({email:$("email").value,password:$("password").value});if(error){showMsg("loginMsg","Nieprawidłowy e-mail lub hasło.");return}location.reload()};
+$("loginBtn").onclick=async()=>{const btn=$("loginBtn");btn.disabled=true;btn.textContent="Logowanie…";$("loginMsg").style.display="none";try{const{data,error}=await db.auth.signInWithPassword({email:$("email").value.trim(),password:$("password").value});if(error){showMsg("loginMsg","Nie udało się zalogować: "+error.message);return}if(!data.session){showMsg("loginMsg","Logowanie nie zostało potwierdzone. Spróbuj ponownie.");return} $("loginView").classList.add("hidden");$("appView").classList.remove("hidden");$("userEmail").textContent=data.user.email;await loadEntries();await loadDietWeeks();renderCalendar()}catch(e){showMsg("loginMsg","Błąd połączenia: "+(e?.message||"spróbuj ponownie."))}finally{btn.disabled=false;btn.textContent="Zaloguj"}};
 $("logoutBtn").onclick=async()=>{await db.auth.signOut();location.reload()};init();
 </script>
 </body></html>
